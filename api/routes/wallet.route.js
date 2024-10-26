@@ -6,12 +6,12 @@ import { getWallet, discharge, charge } from '../controllers/wallet.controller.j
 // import * as walletController from '../controllers/wallet.controller.js';
 
 // Get wallet details
-router.get('/wallet', authMiddleware, getWallet);
+router.get('/', authMiddleware, getWallet);
 
 // Discharge to grid (earn coins)
-router.post('/wallet/discharging', authMiddleware, discharge);
+router.post('/discharging', authMiddleware, discharge);
 
 // Charge EV (redeem coins)
-router.post('/wallet/charging', authMiddleware, charge);
+router.post('/charging', authMiddleware, charge);
 
 export default router;

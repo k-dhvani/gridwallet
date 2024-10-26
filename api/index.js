@@ -1,46 +1,33 @@
 import express from 'express';
-import mongoose from 'mongoose';
+import dbConnection from './config/dbConnection.js';
 import dotenv from 'dotenv';
-import userRouter from './routes/user.route.js';
-import authRouter from './routes/auth.route.js';
-import listingRouter from './routes/listing.route.js';
+import routers from './routes/index.js';
 import cookieParser from 'cookie-parser';
 import path from 'path';
-import walletRoutes from './routes/wallet.route.js';
-dotenv.config();
+import bodyParser from 'body-parser';
 
-mongoose
-  .connect(process.env.DB_URL)
-  .then(() => {
-    console.log('Connected to MongoDB!');
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+const app = express();
+dotenv.config();
 
 const __dirname = path.resolve();
 
-const app = express();
-
+// Middleware
 app.use(express.json());
-
 app.use(cookieParser());
-
-app.listen(3000, () => {
-  console.log('Server is running on port 3000!');
-});
-
-app.use('/api/user', userRouter);
-app.use('/api/auth', authRouter);
-app.use('/api/listing', listingRouter);
-app.use('/api/wallet', walletRoutes);
-
 app.use(express.static(path.join(__dirname, '/client/dist')));
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
+// Routers
+app.use('/api/v1', routers);
+
+app.get('/', (req, res) => {
+  return res.status(200).json({success:true,message:"Welcome to GridWallet"})
+});
+
+app.get('*',(req,res)=>{
+  return res.status(500).json({success:false,message:'You are in wrong URL.'})
 })
 
+// Error Handling Middleware
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   const message = err.message || 'Internal Server Error';
@@ -49,4 +36,11 @@ app.use((err, req, res, next) => {
     statusCode,
     message,
   });
+});
+
+const PORT = process.env.PORT
+// Start Server
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+  dbConnection();
 });
