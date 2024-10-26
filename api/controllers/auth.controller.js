@@ -4,20 +4,27 @@ import { errorHandler } from '../utils/error.js';
 import jwt from 'jsonwebtoken';
 
 export const signup = async (req, res, next) => {
-  const { username, email, password } = req.body;
-  const hashedPassword = bcryptjs.hashSync(password, 10);
-  const newUser = new User({ username, email, password: hashedPassword });
   try {
+    const { username, email, password } = req.body;
+    const hashedPassword = bcryptjs.hashSync(password, 10);
+    const newUser = new User({ username, email, password: hashedPassword });
     await newUser.save();
-    res.status(201).json('User created successfully!');
+    return res.status(201).json({
+      success:true,
+      message:'User created successfully!',
+      data:newUser
+    });
   } catch (error) {
-    next(error);
+    return res.status(500).json({success:false,message:'error while in signUp'+ error});
   }
 };
 
 export const signin = async (req, res, next) => {
-  const { email, password } = req.body;
   try {
+    const { email, password } = req.body;
+    if(!email || !password){
+      return res.status(404).json({message:"email or password must be required."})
+    }
     const validUser = await User.findOne({ email });
     if (!validUser) return next(errorHandler(404, 'User not found!'));
     const validPassword = bcryptjs.compareSync(password, validUser.password);
@@ -29,7 +36,8 @@ export const signin = async (req, res, next) => {
       .status(200)
       .json({ user: rest, token });
   } catch (error) {
-    next(error);
+    return res.status(500).json({success:false,message:'error while in signIn'+ error});
+
   }
 };
 
@@ -65,15 +73,15 @@ export const google = async (req, res, next) => {
         .json(rest);
     }
   } catch (error) {
-    next(error);
+    return res.status(500).json({success:false,message:'error while in Google'+ error});
   }
 };
 
 export const signOut = async (req, res, next) => {
   try {
     res.clearCookie('access_token');
-    res.status(200).json('User has been logged out!');
+    return res.status(200).json('User has been logged out!');
   } catch (error) {
-    next(error);
+    return res.status(500).json({success:false,message:'error while in SignOut'+ error});
   }
 };

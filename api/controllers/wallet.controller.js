@@ -15,11 +15,9 @@ export const getWallet = async (req, res) => {
       });
       await wallet.save(); // Save the new wallet
     }
-
-    // Return the wallet information
-    res.json(wallet);
+    return res.json({success:true,message:wallet});
   } catch (error) {
-    res.status(500).send('Server Error');
+    return res.status(500).json({success:false,message:'error in getwallet'+ error});
   }
 };
 
@@ -29,13 +27,13 @@ export const discharge = async (req, res) => {
   try {
     const wallet = await Wallet.findOne({ user: req.user.id });
     if (!wallet) {
-      return res.status(404).json({ msg: 'Wallet not found' });
+      return res.status(404).json({ success:false, message: 'Wallet not found' });
     }
 
     const { powerAmount } = req.body;
     
     if (!powerAmount || isNaN(powerAmount)) {
-      return res.status(400).json({ msg: 'Invalid power amount' });
+      return res.status(400).json({ success:false,message: 'Invalid power amount' });
     }
 
     // Logic to calculate coins: let's assume 1 kWh gives 10 coins
@@ -58,8 +56,7 @@ export const discharge = async (req, res) => {
     // Respond with the calculated coins
     // res.json({ calculatedCoins: coinsEarned });
     // Respond with the updated wallet
-    res.json(wallet);
-
+    return res.json(wallet);
   } catch (error) {
     console.error(error.message);
     res.status(500).send('Server Error');
@@ -88,8 +85,8 @@ export const charge = async (req, res) => {
     });
 
     await wallet.save();
-    res.json(wallet);
+    return res.status(200).json(wallet);
   } catch (error) {
-    res.status(500).send('Server Error');
+    return res.status(500).send('Server Error');
   }
 };
