@@ -33,7 +33,7 @@ export default function CreateEVListing() {
       setLoading(true);
       setError(false);
 
-      const res = await fetch('/api/ev/register', {
+      const res = await fetch('/ev/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
