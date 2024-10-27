@@ -12,7 +12,7 @@ const WalletPage = () => {
     // Fetch wallet data on component mount
     const fetchWalletData = async () => {
       try {
-        const res = await axios.get("/api/wallet", {
+        const res = await axios.get("/wallet", {
           headers: { "x-auth-token": localStorage.getItem("token") },
         });
         setBalance(res.data.balance);

@@ -26,7 +26,7 @@ export default function DischargingPage() {
 
     try {
       // Replace with your actual API endpoint for calculating coins
-      const response = await fetch('/api/wallet/discharging', {
+      const response = await fetch('/wallet/discharging', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
