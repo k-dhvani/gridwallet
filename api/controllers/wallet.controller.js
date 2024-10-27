@@ -15,7 +15,7 @@ export const getWallet = async (req, res) => {
       });
       await wallet.save(); // Save the new wallet
     }
-    return res.json({success:true,data:wallet});
+    return res.json({success:true,message:wallet});
   } catch (error) {
     return res.status(500).json({success:false,message:'error in getwallet'+ error});
   }
@@ -26,9 +26,8 @@ export const getWallet = async (req, res) => {
 export const discharge = async (req, res) => {
   try {
     const wallet = await Wallet.findOne({ user: req.user.id });
-  
     if (!wallet) {
-      return res.status(404).json({ success:false, message: 'Wallet not found', wallet });
+      return res.status(404).json({ success:false, message: 'Wallet not found' });
     }
 
     const { powerAmount } = req.body;
@@ -51,11 +50,16 @@ export const discharge = async (req, res) => {
       description: `Earned ${coinsEarned} coins for discharging ${powerAmount} kWh`
     });
 
+    // Save the wallet changes
     await wallet.save();
-    return res.json({success:true,data:wallet,message:"discharge successfully."});
-  } catch (error) {
-    return res.status(500).json({success:false,message:"error in  wallet discharge",error});
 
+    // Respond with the calculated coins
+    // res.json({ calculatedCoins: coinsEarned });
+    // Respond with the updated wallet
+    return res.json(wallet);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send('Server Error');
   }
 };
 
@@ -81,8 +85,8 @@ export const charge = async (req, res) => {
     });
 
     await wallet.save();
-    return res.status(200).json({success:true,data:wallet});
+    return res.status(200).json(wallet);
   } catch (error) {
-    return res.status(500).json({success:false,message:"error in  wallet charge",error});
+    return res.status(500).send('Server Error');
   }
 };
